@@ -1,101 +1,41 @@
 from scrapy import Spider, Request
 from tv.items import TvItem
-import re
-import math
 
-"""The passes is essentially to go through the different genres. I wasnt comfortable to do everything
-in one go because i was still doing other things simultaneously as well. I started from the most 
-genre."""
 
 class tv_crawl(Spider):
     name = 'tv_crawl'
     allowed_urls = ['https://www.metacritic.com']
-    
-    # # First Pass: Drama
-    # start_urls = ['https://www.metacritic.com/browse/tv/genre/name/drama?view=condensed']
-    
-    # # Second Pass: Action and Adventure
-    # start_urls = ['https://www.metacritic.com/browse/tv/genre/name/actionadventure?view=condensed']
-
-    # # Third Pass: Suspense
-    # start_urls = ['https://www.metacritic.com/browse/tv/genre/name/suspense?view=condensed']
-    
-    # # Fourth Pass: Comedy
-    # start_urls = ['https://www.metacritic.com/browse/tv/genre/name/comedy?view=condensed']
-    
-    # # Fifth Pass: Movie/Mini-Series
-    # start_urls = ['https://www.metacritic.com/browse/tv/genre/name/moviemini-series?view=condensed']
-
-    # # Sixth Pass: Fantasy
-    # start_urls = ['https://www.metacritic.com/browse/tv/genre/name/fantasy?view=condensed']
-
-    # # Seventh Pass: Animation
-    # start_urls = ['https://www.metacritic.com/browse/tv/genre/name/animation?view=condensed']
-
-    # # Eighth Pass: Documentary
-    # start_urls = ['https://www.metacritic.com/browse/tv/genre/name/documentary?view=condensed']
-
-    # # Ninth Pass: Food and Cooking
-    start_urls = ['https://www.metacritic.com/browse/tv/genre/name/foodcooking?view=condensed']
-
-    # # Tenth Pass: Kids
-    # start_urls = ['https://www.metacritic.com/browse/tv/genre/name/kids?view=condensed']
-
-    # # Eleventh Pass: Science Fiction
-    # start_urls = ['https://www.metacritic.com/browse/tv/genre/name/sciencefiction?view=condensed']
-
-    # # Twelfth Pass: Horror
-    # start_urls = ['https://www.metacritic.com/browse/tv/genre/name/horror?view=condensed']
-
-    # # Thirteenth Pass: Reality
-    # start_urls = ['https://www.metacritic.com/browse/tv/genre/name/reality?view=condensed']
-
+    genres = ['actionadventure', 'animation', 'arts', 'business', 'comedy', 'documentary', 'educational', 
+    'eventsspecials','fantasy', 'foodcooking', 'gameshow', 'healthylifestyle','horror', 'kids', 'moviemini-series', 'music', 
+    'news', 'newsdocumentary', 'reality', 'science', 'soap', 'sports', 'suspense', 'talkinterview', 
+    'techgaming', 'travel','variety-shows']
+    start_urls = [f'https://www.metacritic.com/browse/tv/genre/date/{j}?view=condensed' for j in genres]
 
     def parse (self, response):
-        num_pages = int(response.xpath('.//a[@class="page_num"]//text()').extract()[-1])
         
-        # #First Pass: Drama 
-        # page_urls = [f'https://www.metacritic.com/browse/tv/genre/name/drama?view=condensed&page={i}' for i in range(num_pages)]
- 
-        # # Second Pass: Action and Adventure
-        # page_urls = [f'https://www.metacritic.com/browse/tv/genre/name/actionadventure?view=condensed&page={i}' for i in range(num_pages)]
+        try: 
+            num_pages = int(response.xpath('//li[@class="page last_page"]//text()').extract()[-1])
+            full_urls = [response.url + f'&page={i}' for i in range(num_pages)]
+        except:
+            full_urls = [response.url + '&page=0']
+
         
-        # # Third Pass: Suspense
-        # page_urls = [f'https://www.metacritic.com/browse/tv/genre/name/suspense?view=condensed&page={i}' for i in range(num_pages)]
-        
-        # # Fourth Pass: Comedy
-        # page_urls = [f'https://www.metacritic.com/browse/tv/genre/name/comedy?view=condensed&page={i}' for i in range(num_pages)]
+        ##CHECKPOINT
+        # for url in full_urls:
+        #     print('='*50)
+        #     print(url)
+#             yield Request(url=url, callback=self.parse_show_page)
 
-        # # Fifth Pass: Movie/Mini-Series
-        # page_urls = [f'https://www.metacritic.com/browse/tv/genre/name/moviemini-series?view=condensed&page={i}' for i in range(num_pages)]
-
-        # # Sixth Pass: Fantasy
-        # page_urls = [f'https://www.metacritic.com/browse/tv/genre/name/fantasy?view=condensed&page={i}' for i in range(num_pages)]
-
-        # # Seventh Pass: Animation
-        # page_urls = [f'https://www.metacritic.com/browse/tv/genre/name/animation?view=condensed&page={i}' for i in range(num_pages)]
-
-        # # Eighth Pass: Documentary
-        # page_urls = [f'https://www.metacritic.com/browse/tv/genre/name/documentary?view=condensed&page={i}' for i in range(num_pages)]
-
-        # # Ninth Pass: Food and Cooking
-        page_urls = [f'https://www.metacritic.com/browse/tv/genre/name/foodcooking?view=condensed&page={i}' for i in range(num_pages)]
-
-        # # Tenth Pass: Kids
-        # page_urls = [f'https://www.metacritic.com/browse/tv/genre/name/kids?view=condensed&page={i}' for i in range(num_pages)]
-
-        # # Eleventh Pass: Science Fiction
-        # page_urls = [f'https://www.metacritic.com/browse/tv/genre/name/sciencefiction?view=condensed&page={i}' for i in range(num_pages)]
-
-        # # Twelfth Pass: Horror
-        # page_urls = [f'https://www.metacritic.com/browse/tv/genre/name/horror?view=condensed&page={i}' for i in range(num_pages)]
-
-        # # Thirteenth Pass: Reality
-        # page_urls = [f'https://www.metacritic.com/browse/tv/genre/name/reality?view=condensed&page={i}' for i in range(num_pages)]
-
-
-        for url in page_urls:
+        for url in full_urls:
             yield Request(url=url, callback=self.parse_show_page)
+
+
+
+        # # CHECKPOINT complete
+        # for url in page_urls:
+        #     print("=="*50)
+        #     print(url)
+
 
     def parse_show_page(self, response):
 
@@ -106,7 +46,7 @@ class tv_crawl(Spider):
         for url in show_urls:
             yield Request(url=url, callback=self.parse_detail_page)
 
-        # # CHECKPOINT #1 : Complete
+        # # CHECKPOINT complete
         # print("==" * 50)
         # print(len(show_urls))
         # print("==" * 50)
@@ -139,7 +79,24 @@ class tv_crawl(Spider):
 
         # number of critics and users that rated the series
         num_critics = response.xpath('.//span[@class="based_on"]/text()').extract_first()
-        num_users = response.xpath('.//span[@class="based_on"]/text()').extract()[-1]
+
+        try: 
+            num_users = response.xpath('.//span[@class="based_on"]/text()').extract()[-1]
+        except:
+            num_users = 'not available'
+
+
+#         # # CHECKPOINT complete
+#         # print("=="*50)
+#         # print(title)
+#         # print(season)
+#         # print(genre)
+#         # print(release_date)
+#         # print(network)
+#         # print(critic)
+#         # print(user)
+#         # print(num_critics)
+#         # print(num_users)
 
         item = TvItem()
         item ['Title'] = title
