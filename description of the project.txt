@@ -1,0 +1,19 @@
+Name: Catherine Tang Kim Sin
+
+Topic: Analysis of TV Series based on information scraped out of metacritic.com
+
+Short Introduction: 
+Using Metacritic, i hoped to find out if there were patterns of different tv series that contribute to their success or downfall.
+
+If there was a pattern in big networks as to how they choose their programs or how they distribute their time slots between different genres.
+
+Finally, if seasons of the year is a factor in the difference of user votes. whether it be shows chosen by networks for a certain season
+or just an over change in voters' voting pattern
+
+
+Contents of the File:
+1. 'tv' folder -  contains the webscraping spider
+2. 'formulas.ipynb' - contains the formula to clean the raw data and to obtain the information needed for the analysis
+3. first_project_presentation - powerpoint to be presented
+4. tv_crawl.v2.csv - the final complete data of the wescraping
+
